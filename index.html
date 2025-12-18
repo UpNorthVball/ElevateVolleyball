@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Elevate Volleyball</title>
+  <meta name="description" content="Elevate Volleyball — competitive, inclusive leagues in the Seattle area." />
+
+  <meta property="og:title" content="Elevate Volleyball" />
+  <meta property="og:description" content="Competitive, inclusive volleyball leagues. Seattle Pacific University (Mon–Fri) & Mountlake Terrace Elementary School (Sundays)." />
+
+  <style>
+    :root{
+      --accent:#D4AF37;               /* gold */
+      --dark:#0f1216;                 /* gunmetal */
+      --muted:rgba(255,255,255,.86);
+      --muted2:rgba(255,255,255,.72);
+      --card:rgba(15,18,22,.72);
+      --border:rgba(212,175,55,.35);
+      --shadow:0 18px 50px rgba(0,0,0,.45);
+    }
+
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color:var(--muted);
+      background:var(--dark);
+      overflow-x:hidden;
+    }
+
+    /* Sticky background (image + overlay) */
+    .bg-layer{
+      position:fixed;
+      inset:0;
+      z-index:-3;
+      pointer-events:none;
+      transform:translateZ(0);
+      will-change:transform;
+    }
+    .bg-layer img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      display:block;
+      backface-visibility:hidden;
+      transform:translateZ(0);
+    }
+
+    .bg-overlay{
+      position:fixed;
+      inset:0;
+      z-index:-2;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(0,0,0,.62), rgba(0,0,0,.62)),
+        radial-gradient(1200px 800px at 20% 10%, rgba(212,175,55,.10), transparent 60%),
+        radial-gradient(900px 700px at 80% 30%, rgba(255,255,255,.06), transparent 55%);
+    }
+
+    .bg-grain{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      opacity:.10;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      background-size:160px 160px;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+      background:rgba(10,12,15,.55);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .topbar-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{
+      display:flex;
+      align-items:baseline;
+      gap:10px;
+      text-decoration:none;
+      color:var(--muted);
+    }
+    .brand .name{
+      font-weight:800;
+      letter-spacing:.6px;
+      color:var(--accent);
+      font-size:18px;
+      text-shadow:0 0 18px rgba(212,175,55,.16);
+    }
+    .brand .tag{
+      font-size:12px;
+      color:var(--muted2);
+      letter-spacing:.4px;
+    }
+
+    .menu-btn{
+      border:1px solid rgba(212,175,55,.35);
+      background:rgba(0,0,0,.25);
+      color:var(--muted);
+      border-radius:14px;
+      padding:10px 12px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      box-shadow:0 10px 24px rgba(0,0,0,.25);
+    }
+    .menu-btn:active{ transform:translateY(1px); }
+    .burger{
+      width:20px;
+      height:14px;
+      display:inline-grid;
+      gap:3px;
+    }
+    .burger span{
+      display:block;
+      height:2px;
+      background:rgba(255,255,255,.85);
+      border-radius:10px;
+    }
+
+    .dropdown{
+      display:none;
+      border-top:1px solid rgba(255,255,255,.08);
+      background:rgba(10,12,15,.72);
+    }
+    .dropdown.open{ display:block; }
+    .dropdown-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:10px 16px 14px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .navlink{
+      text-decoration:none;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.18);
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:14px;
+    }
+    .navlink:hover{
+      border-color:rgba(212,175,55,.35);
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px 16px 60px;
+    }
+
+    .hero{
+      padding:34px 18px;
+      border-radius:22px;
+      background:rgba(15,18,22,.55);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:before{
+      content:"";
+      position:absolute;
+      inset:-40px;
+      background:
+        radial-gradient(550px 280px at 20% 15%, rgba(212,175,55,.18), transparent 60%),
+        radial-gradient(520px 260px at 80% 30%, rgba(255,255,255,.08), transparent 60%);
+      pointer-events:none;
+    }
+    .hero-inner{
+      position:relative;
+      display:grid;
+      gap:12px;
+      text-align:center;
+    }
+    h1{
+      margin:0;
+      font-size:42px;
+      line-height:1.05;
+      letter-spacing:.5px;
+      color:var(--accent);
+      text-shadow:0 0 18px rgba(212,175,55,.18);
+    }
+    .subtitle{
+      margin:0;
+      font-size:16px;
+      color:var(--muted);
+    }
+    .subtle{
+      margin:0;
+      color:var(--muted2);
+      font-size:13px;
+    }
+
+    .section{
+      margin-top:22px;
+      padding:18px 16px;
+      border-radius:22px;
+      background:rgba(15,18,22,.55);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:0 14px 42px rgba(0,0,0,.35);
+    }
+    .section h2{
+      margin:0 0 10px;
+      text-align:center;
+      color:var(--accent);
+      letter-spacing:.4px;
+    }
+    .section p{
+      margin:0;
+      text-align:center;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .section-img-wrap{
+      margin-top:14px;
+      display:flex;
+      justify-content:center;
+    }
+    .section-img{
+      width:min(560px, 100%);
+      height:auto;
+      margin:12px auto 0;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 16px 44px rgba(0,0,0,.45);
+      display:block;
+    }
+    .section-img:focus{ outline:none; }
+    .section .hint{
+      margin-top:8px;
+      text-align:center;
+      font-size:13px;
+      color:var(--muted2);
+    }
+
+    @keyframes pulseGlow {
+      0%   { box-shadow:0 0 0 rgba(212,175,55,0), 0 12px 30px rgba(0,0,0,.35); }
+      50%  { box-shadow:0 0 18px rgba(212,175,55,.22), 0 18px 44px rgba(0,0,0,.45); }
+      100% { box-shadow:0 0 0 rgba(212,175,55,0), 0 12px 30px rgba(0,0,0,.35); }
+    }
+    .grid{
+      display:grid;
+      gap:14px;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      margin-top:12px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:16px;
+      animation:pulseGlow 3.6s ease-in-out infinite;
+    }
+    .card h3{
+      margin:0 0 8px;
+      text-align:center;
+      color:var(--accent);
+      letter-spacing:.35px;
+    }
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:center;
+      margin:10px 0 0;
+    }
+    .pill{
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.18);
+      color:var(--muted);
+    }
+    .list{
+      margin:10px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+      text-align:center;
+      color:var(--muted);
+    }
+    .list li{
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.14);
+    }
+    .list a{
+      color:var(--muted);
+      text-decoration:underline;
+      text-underline-offset:3px;
+    }
+    .list a:hover{ color:var(--accent); }
+    .label{
+      color:var(--muted2);
+      font-size:12px;
+      letter-spacing:.3px;
+    }
+
+    .cta-row{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:10px;
+      margin-top:12px;
+    }
+    .btn{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:11px 14px;
+      border-radius:16px;
+      border:1px solid rgba(212,175,55,.35);
+      background:rgba(0,0,0,.22);
+      color:var(--muted);
+      box-shadow:0 12px 30px rgba(0,0,0,.35);
+    }
+    .btn:hover{ border-color:rgba(212,175,55,.55); }
+
+    footer{
+      margin-top:18px;
+      text-align:center;
+      color:var(--muted2);
+      font-size:12px;
+    }
+
+    @media (max-width: 840px){
+      h1{ font-size:34px; }
+      .grid{ grid-template-columns:1fr; }
+      .brand .tag{ display:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NOTE: Facebook CDN image links can expire. If this ever stops loading, host the image on your site/GitHub and swap the URL. -->
+  <div class="bg-layer" aria-hidden="true">
+    <img
+      src="https://scontent-sea1-1.xx.fbcdn.net/v/t39.30808-6/461669215_876454137912785_6098173431616599758_n.jpg?_nc_cat=104&cb2=99be929b-bd9a46d7&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=YkagoyknM4QQ7kNvwFmFPk-&_nc_oc=AdnIBih-lEPAdrDfg4zwRO8pCpCdsRRNIc1vPpZbhzyNVUVBoRX3_PTBo1gY6f9xpdW7GsoPXl9iofRwGqoPME3M&_nc_zt=23&_nc_ht=scontent-sea1-1.xx&_nc_gid=pQHMNgcQ5HEQHdOOMW48dA&oh=00_AfkI0bBwmdkw0IYNl1fRsXU5im0NBxBP7flpt3d83uCZUA&oe=6949FD59"
+      alt=""
+      loading="eager"
+      decoding="async"
+      referrerpolicy="no-referrer"
+    />
+  </div>
+  <div class="bg-overlay" aria-hidden="true"></div>
+  <div class="bg-grain" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top" aria-label="Elevate Volleyball Home">
+        <span class="name">ELEVATE VOLLEYBALL</span>
+        <span class="tag">Leagues • Community • Growth</span>
+      </a>
+
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="dropdownMenu">
+        <span class="burger" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>Menu</span>
+      </button>
+    </div>
+
+    <nav class="dropdown" id="dropdownMenu">
+      <div class="dropdown-inner">
+        <a class="navlink" href="#who">What is Elevate Volleyball</a>
+        <a class="navlink" href="#locations">League Locations</a>
+        <a class="navlink" href="#details">League Details</a>
+        <a class="navlink" href="#contact">Contact</a>
+        <a class="navlink" href="#top">Back to Top</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top" class="wrap">
+    <section class="hero" aria-label="Hero">
+      <div class="hero-inner">
+        <h1>Elevate Volleyball</h1>
+        <p class="subtitle">Elevate your game. Find your people. Keep showing up.</p>
+        <p class="subtle">Seattle Pacific University (Mon–Fri) • Mountlake Terrace Elementary School (Sundays)</p>
+
+        <div class="cta-row">
+          <a class="btn" href="#locations">View Locations</a>
+          <a class="btn" href="#contact">Get In Touch</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="who" class="section" aria-label="What is Elevate Volleyball">
+      <h2>What is Elevate Volleyball</h2>
+      <p>
+        Elevate Volleyball is a community-first league built for players who want more than just court time —
+        a consistent place to compete, grow, and belong. We keep the standard high, the environment welcoming,
+        and the community at the center of it all.
+      </p>
+
+      <div class="section-img-wrap">
+        <a href="https://scontent-sea5-1.xx.fbcdn.net/v/t39.30808-6/482016491_987563923468472_3511126612245570800_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=103&cb2=99be929b-bd9a46d7&ccb=1-7&_nc_sid=f727a1&_nc_ohc=9Gm9ApwBsCwQ7kNvwH2o5qn&_nc_oc=AdlCqlB8tYeSf8n6PdLVbDu9RxlPvEfLSEgYH0L-_nFN58oqHn7tUez9nVPlZCs3i5obMzb_1ap2SlV5M-rVztHb&_nc_zt=23&_nc_ht=scontent-sea5-1.xx&_nc_gid=Lt1b4PkZa2RqTKRtO1y_Ag&oh=00_AfldWu0ZORGiXhQHQlneP64peR5-mwjRHfG1HIyrvvoplQ&oe=6949FBF2"
+           target="_blank" rel="noreferrer noopener">
+          <img class="section-img"
+               src="https://scontent-sea5-1.xx.fbcdn.net/v/t39.30808-6/482016491_987563923468472_3511126612245570800_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=103&cb2=99be929b-bd9a46d7&ccb=1-7&_nc_sid=f727a1&_nc_ohc=9Gm9ApwBsCwQ7kNvwH2o5qn&_nc_oc=AdlCqlB8tYeSf8n6PdLVbDu9RxlPvEfLSEgYH0L-_nFN58oqHn7tUez9nVPlZCs3i5obMzb_1ap2SlV5M-rVztHb&_nc_zt=23&_nc_ht=scontent-sea5-1.xx&_nc_gid=Lt1b4PkZa2RqTKRtO1y_Ag&oh=00_AfldWu0ZORGiXhQHQlneP64peR5-mwjRHfG1HIyrvvoplQ&oe=6949FBF2"
+               alt="Elevate Volleyball"
+               loading="eager"
+               decoding="async"
+               referrerpolicy="no-referrer" />
+        </a>
+      </div>
+    </section>
+
+    <section id="locations" class="section" aria-label="League Locations">
+      <h2>League Locations</h2>
+      
+      <div class="grid" role="list">
+        <article class="card" role="listitem">
+          <h3>Seattle Pacific University</h3>
+
+          <ul class="list">
+            <li>
+              <div class="label">Days</div>
+              <div><strong>Monday – Friday</strong></div>
+            </li>
+            <li>
+              <div class="label">League Details</div>
+              <div>
+                Mondays Coed 6's (BB-/B)<br>
+                Tuesdays Reverse 4's/Women's 6's (BB/A)<br>
+                Wednesdays Coed 6's (BB/A) &amp; (BB/BB+)<br>
+                Thursday Reverse 4's (BB/A) &amp; (BB/BB+)<br>
+                Friday Coed 6's (BB)
+              </div>
+            </li>
+            <li>
+              <div class="label">Address</div>
+              <div><a href="https://www.google.com/maps/search/?api=1&query=3414%203rd%20Ave%20W%2C%20Seattle%2C%20WA%2098119" target="_blank" rel="noopener noreferrer">3414 3rd Ave W, Seattle, WA 98119</a></div>
+            </li>
+          </ul>
+
+          <div class="meta" aria-label="Tags">
+            <span class="pill">Weeknights</span>
+            <span class="pill">Seattle</span>
+            <span class="pill">Indoor</span>
+          </div>
+        </article>
+
+        <article class="card" role="listitem">
+          <h3>Mountlake Terrace Elementary School</h3>
+
+          <ul class="list">
+            <li>
+              <div class="label">Days</div>
+              <div><strong>Sundays</strong></div>
+            </li>
+            <li>
+              <div class="label">League Details</div>
+              <div>Sundays (BB)</div>
+            </li>
+            <li>
+              <div class="label">Address</div>
+              <div><a href="https://www.google.com/maps/search/?api=1&query=5409%20228th%20St%20SW%2C%20Mountlake%20Terrace%2C%20WA%2098043" target="_blank" rel="noopener noreferrer">5409 228th St SW, Mountlake Terrace, WA 98043</a></div>
+            </li>
+          </ul>
+
+          <div class="meta" aria-label="Tags">
+            <span class="pill">Sundays</span>
+            <span class="pill">Mountlake Terrace</span>
+            <span class="pill">Indoor</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="details" class="section" aria-label="League Details">
+      <h2>League Details</h2>
+      
+      <div class="grid" style="margin-top:14px;">
+        <article class="card">
+          <h3>What to Expect</h3>
+          <ul class="list">
+            <li>Competitive play with a welcoming culture — plus quarterly socials for community bonding.</li>
+            <li>2-hour time blocks for each session, 8–10 weeks of play.</li>
+            <li><a href="https://upnorthvball.github.io/Skill-Guide/" target="_blank" rel="noopener">Assess your skill level here</a> to see where you align in Elevate Volleyball events.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Registration & Info</h3>
+          <ul class="list">
+
+            <li>Registration is done via Facebook Messenger, you can message either Elevate Volleyball or Alex Sum</li>
+            <li>Payment is done via venmo through: @elevatevolleyball</li>
+            <li>Captains deposit is due at registration with league fees due two weeks to new season starting</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact" class="section" aria-label="Contact">
+      <h2>Contact</h2>
+      <p>
+        Want to register, ask a question, or bring a group? Reach out and we’ll help you find the right fit.
+      </p>
+
+      <div class="cta-row">
+        <a class="btn" href="mailto:alex@sumconsulting.org">Email Us</a>
+        <a class="btn" href="https://www.facebook.com/elevatevball" target="_blank" rel="noopener noreferrer">Follow on Social</a>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Elevate Volleyball • Built for community and consistency.
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const btn = document.getElementById("menuBtn");
+    const menu = document.getElementById("dropdownMenu");
+
+    btn.addEventListener("click", () => {
+      const open = menu.classList.toggle("open");
+      btn.setAttribute("aria-expanded", String(open));
+    });
+
+    menu.addEventListener("click", (e) => {
+      const a = e.target.closest("a");
+      if(!a) return;
+      menu.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+    });
+  </script>
+</body>
+</html>
